@@ -23,7 +23,7 @@ import StartCall from "../../sections/main/StartCall";
 const Call = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const theme = useTheme();
-  const { sidebar } = useSelector((store) => store.app);
+  const { sidebar } = useSelector((state) => state.app);
 
   const handleClose = () => {
     setOpenDialog(false)
@@ -83,7 +83,7 @@ const Call = () => {
             >
               <Stack spacing={2.4}>
                 {/* Chat list */}
-                {CallLogs.map((log)=>(<CallLogElement {...log} />))}
+                {CallLogs.map((log, idx)=>(<CallLogElement key={idx} {...log} />))}
               </Stack>
             </Stack>
           </Stack>

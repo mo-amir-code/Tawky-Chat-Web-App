@@ -19,20 +19,22 @@ import {
   StyledInputBase,
 } from "../../components/Search/index";
 import { useTheme } from "@mui/material/styles";
-import { ChatList } from "../../data";
 import ChatElement from "../../components/ChatElement";
 import Friends from "../../sections/main/Friends";
 import { useEffect } from "react";
 // import { SimpleBarStyle } from "../../components/Scrollbar";
-import { socket } from '../../socket'
-import { useSelector } from "react-redux";
-
+import { socket } from "../../socket";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchDirectConversations } from "../../Redux/slices/conversation/conversation";
 
 const Chats = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const theme = useTheme();
-  const { userId } = useSelector((state) => state.auth )
-  const {conversations} = useSelector((state) => state.conversation.directChat )
+  const { userId } = useSelector((state) => state.auth);
+  const { conversations } = useSelector(
+    (state) => state.conversation.directChat
+  );
+  const dispatch = useDispatch();
 
   const handleOpenDialog = () => {
     setOpenDialog(true);
@@ -41,12 +43,13 @@ const Chats = () => {
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
-   
-  useEffect(()=>{
-    socket.emit("get-direct-conversations", {userId}, (data)=>{
+
+  useEffect(() => {
+    socket.emit("get-direct-conversations", { userId }, (data) => {
       // data --> list of conversation
-    })
-  }, [])
+      dispatch(fetchDirectConversations(data));
+    });
+  }, []);
 
   return (
     <>
@@ -124,16 +127,18 @@ const Chats = () => {
               <Typography variant="subtitle2" sx={{ color: "#676767" }}>
                 All Chats
               </Typography>
-              {conversations.filter((el) => !el.pinned).map((el) => (
-                <ChatElement {...el} />
-              ))}
+              {conversations
+                .filter((el) => !el.pinned)
+                .map((el, idx) => (
+                  <ChatElement key={idx} {...el} />
+                ))}
             </Stack>
             {/* </SimpleBarStyle> */}
           </Stack>
         </Stack>
       </Box>
       {openDialog && (
-        <Friends open={openDialog} handleClose={handleCloseDialog} />
+        <Friends open={openDialog} handleClose={handleCloseDialog} setOpenDialog={setOpenDialog} />
       )}
     </>
   );

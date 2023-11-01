@@ -64,7 +64,7 @@ const UserComponent = ({ firstName, lastName, id, online, img }) => {
   );
 };
 
-const FriendsComponent = ({ firstName, lastName, id, online, img }) => {
+const FriendsComponent = ({ firstName, lastName, id, online, img, setOpenDialog }) => {
   const { userId } = useSelector((state) => state.auth);
   const theme = useTheme();
   const name = `${firstName} ${lastName}`;
@@ -101,6 +101,7 @@ const FriendsComponent = ({ firstName, lastName, id, online, img }) => {
         <Stack spacing={2} alignItems={"center"} direction={"row"}>
           <IconButton onClick={()=>{
             socket.emit("start-conversation", {to:id, from:userId})
+            setOpenDialog(false)
           }} >
             <Chat/>
           </IconButton>

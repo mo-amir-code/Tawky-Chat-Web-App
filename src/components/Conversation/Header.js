@@ -11,12 +11,22 @@ import React from "react";
 import { faker } from "@faker-js/faker";
 import StyledBadge from "../StyledBadge";
 import { CaretDown, MagnifyingGlass, Phone, VideoCamera } from "phosphor-react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toggleSidebar, updateSidebarType } from "../../Redux/slices/app/app";
+import { useState } from "react";
+import { useEffect } from "react";
 
 const Header = () => {
   const theme = useTheme();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+  const { currentConversation } = useSelector(
+    (state) => state.conversation.directChat
+  );
+
+  // if(!currentConversation){
+  //   return;
+  // }
+
   return (
     <Box
       p={2}
@@ -35,22 +45,32 @@ const Header = () => {
         direction={"row"}
         sx={{ width: "100%", height: "100%" }}
       >
-        <Stack onClick={()=>{
-          // dispatch(updateSidebarType("SHARED"))
-          dispatch(toggleSidebar())
-        }} direction={"row"} spacing={2}>
+        <Stack
+          onClick={() => {
+            // dispatch(updateSidebarType("SHARED"))
+            dispatch(toggleSidebar());
+          }}
+          direction={"row"}
+          spacing={2}
+        >
           <Box>
-            <StyledBadge
-              overlap="circular"
-              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-              variant="dot"
-            >
-              <Avatar src={faker.image.avatar()} alt={faker.name.fullName()} />
-            </StyledBadge>
+            {currentConversation?.online ? (
+              <StyledBadge
+                overlap="circular"
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                variant="dot"
+              >
+                <Avatar src={currentConversation?.avatar} alt={currentConversation?.name} />
+              </StyledBadge>
+            ) : (
+              <Avatar src={currentConversation?.avatar} alt={currentConversation?.name} />
+            )}
           </Box>
           <Stack spacing={0.2}>
-            <Typography variant="subtitle2">{faker.name.fullName()}</Typography>
-            <Typography variant="caption">Online</Typography>
+            <Typography variant="subtitle2">{currentConversation?.name}</Typography>
+            <Typography variant="caption">
+              {currentConversation?.online ? "Online" : "Offline" }
+            </Typography>
           </Stack>
         </Stack>
         <Stack direction={"row"} alignItems={"center"} spacing={3}>

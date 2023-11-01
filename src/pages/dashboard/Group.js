@@ -27,7 +27,7 @@ import { useState } from "react";
 const Group = () => {
   const [openDialog, setOpenDialog] = useState(false)
   const theme = useTheme();
-  const {sidebar} = useSelector((store)=>store.app);
+  const {sidebar} = useSelector((state)=>state.app);
 
 
   const handleCloseDialog = () => {
@@ -91,8 +91,8 @@ const Group = () => {
                   Pinned
                 </Typography>
                 {/* Chat List */}
-                {ChatList.filter((el) => el.pinned).map((el) => (
-                  <ChatElement {...el} />
+                {ChatList.filter((el) => el.pinned).map((el, idx) => (
+                  <ChatElement key={idx} {...el} />
                 ))}
               </Stack>
               <Stack spacing={2.4}>
@@ -100,8 +100,8 @@ const Group = () => {
                   All Groups
                 </Typography>
                 {/* Chat List */}
-                {ChatList.filter((el) => !el.pinned).map((el) => (
-                  <ChatElement {...el} />
+                {ChatList.filter((el) => !el.pinned).map((el, idx) => (
+                  <ChatElement key={idx} {...el} />
                 ))}
               </Stack>
             </Stack>

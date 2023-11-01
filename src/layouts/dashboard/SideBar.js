@@ -18,6 +18,7 @@ import { Nav_Buttons, Profile_Menu } from "../../data";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { logout } from "../../Redux/slices/auth/authSlice";
+import { persistor } from '../../Redux/store'
 
 const getPath = (index) => {
   switch (index) {
@@ -51,6 +52,7 @@ function SideBar() {
         return "/settings";
       case 2:
         dispatch(logout());
+        
         return "/auth/login";
       default:
         return;
@@ -191,7 +193,7 @@ function SideBar() {
           >
             <Stack direction={"column"} spacing={1} px={1}>
               {Profile_Menu.map((el, idx) => (
-                <MenuItem onClick={handleClick}>
+                <MenuItem key={idx} onClick={handleClick}>
                   <Stack
                     sx={{ width: 100 }}
                     onClick={() => {

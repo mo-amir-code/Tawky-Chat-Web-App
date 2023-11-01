@@ -11,10 +11,15 @@ import {
   updateDirectConversation,
 } from "../../Redux/slices/conversation/conversation";
 import { SelectConversation } from "../../Redux/slices/app/app";
+import { useTheme } from "@emotion/react";
+import { BellRinging } from "phosphor-react";
 
 const DashboardLayout = () => {
+  const theme = useTheme();
   const { isLoggedIn, userId } = useSelector((state) => state.auth);
-  const { conversations } = useSelector((state)=>state.conversation.directChat);
+  const { conversations } = useSelector(
+    (state) => state.conversation.directChat
+  );
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -34,10 +39,10 @@ const DashboardLayout = () => {
 
       socket.on("new-friend-request", (data) => {
         toast(data.message, {
-          icon: "👏",
+          icon: <BellRinging/>,
           style: {
             borderRadius: "10px",
-            background: "#333",
+            background: theme.palette.primary.main,
             color: "#fff",
           },
         });
@@ -53,24 +58,16 @@ const DashboardLayout = () => {
         });
       });
       socket.on("request-sent", (data) => {
-        toast(data.message, {
-          icon: "👏",
-          style: {
-            borderRadius: "10px",
-            background: "#333",
-            color: "#fff",
-          },
-        });
+        toast.success(data.message);
       });
       socket.on("start-chat", (data) => {
         const existingConversation = conversations.find(
-          (el) => el.id === data.id
+          (el) => el.id === data.id.toString()
         );
         if (existingConversation) {
-          dispatch(updateDirectConversation({ conversation: data }));
+          dispatch(updateDirectConversation({ conversations: data, userId }));
         } else {
-          // add direct conversation
-          dispatch(addDirectConversation({ conversation: data }));
+          dispatch(addDirectConversation({ conversations: data, userId }));
         }
         dispatch(SelectConversation({ roomId: data.id }));
       });
@@ -84,7 +81,7 @@ const DashboardLayout = () => {
     };
 
     // eslint-disable-next-line
-  }, [isLoggedIn, userId ]);
+  }, [isLoggedIn, userId]);
 
   if (!isLoggedIn) {
     return <Navigate to={"/auth/login"} />;

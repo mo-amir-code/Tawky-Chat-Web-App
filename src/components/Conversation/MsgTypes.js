@@ -12,8 +12,13 @@ import {
 import { DotsThreeVertical, DownloadSimple, Image } from "phosphor-react";
 import React from "react";
 import { Message_options } from "../../data";
+import { shortDocName } from "../../services/services";
+import { useDispatch } from "react-redux";
+import { ToggleIsReplyStatus } from "../../Redux/slices/conversation/conversation";
+import { ReplyMessageTemplate } from "../PreviewMessages";
 
-const DocMsg = ({ el, menu }) => {
+const DocMsg = ({ el, menu, preview }) => {
+
   const theme = useTheme();
   return (
     <Stack direction={"row"} justifyContent={el.incoming ? "start" : "end"}>
@@ -21,10 +26,13 @@ const DocMsg = ({ el, menu }) => {
         p={1.5}
         sx={{
           backgroundColor: el.incoming
-            ? theme.palette.background.default
+            ? theme.palette.mode === "light"
+              ? "#fff"
+              : "#212B36"
             : theme.palette.primary.main,
           borderRadius: 1.5,
-          width: "max-content",
+          width: preview? "100%": "max-content",
+          maxWidth:"60%"
         }}
       >
         <Stack spacing={2}>
@@ -34,12 +42,15 @@ const DocMsg = ({ el, menu }) => {
             alignItems={"center"}
             spacing={3}
             sx={{
-              backgroundColor: theme.palette.background.paper,
+              backgroundColor:
+                theme.palette.mode === "light" ? "#F0F4FA" : "#161C24",
               borderRadius: 1,
             }}
           >
             <Image size={48} />
-            <Typography variant="cation">Abstract.png</Typography>
+            <Typography variant="cation">
+              {shortDocName(el.fileName)}
+            </Typography>
             <IconButton>
               <DownloadSimple />
             </IconButton>
@@ -52,23 +63,35 @@ const DocMsg = ({ el, menu }) => {
           </Typography>
         </Stack>
       </Box>
-      {menu && <MessageActions />}
+      {(menu || !preview) && <MessageActions id={el.id} />}
     </Stack>
   );
 };
 
-const LinkMsg = ({ el, menu }) => {
+const LinkMsg = ({ el, menu, preview }) => {
+
   const theme = useTheme();
+
+  const isPreview = (message) => {
+    if (message.startsWith("http")) {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <Stack direction={"row"} justifyContent={el.incoming ? "start" : "end"}>
       <Box
         p={1.5}
         sx={{
           backgroundColor: el.incoming
-            ? theme.palette.background.default
+            ? theme.palette.mode === "light"
+              ? "#fff"
+              : "#212B36"
             : theme.palette.primary.main,
           borderRadius: 1.5,
-          width: "max-content",
+          width:preview? "100%": "max-content",
+          maxWidth:"60%"
         }}
       >
         <Stack spacing={2}>
@@ -77,41 +100,48 @@ const LinkMsg = ({ el, menu }) => {
             spacing={3}
             // alignItems={"center"}
             sx={{
-              backgroundColor: theme.palette.background.paper,
+              backgroundColor:
+                theme.palette.mode === "light" ? "#F0F4FA" : "#161C24",
               borderRadius: 1,
             }}
           >
-            <img
-              src={el.preview}
-              alt={el.message}
-              style={{ maxHeight: 210, borderRadius: "10px" }}
-            />
+            {isPreview(el.message) && (
+              <img
+                src={el.message}
+                alt={el.message}
+                style={{ maxHeight: 210, borderRadius: "10px", height: 25 }}
+              />
+            )}
             <Stack spacing={2}>
-              <Typography variant="subtitle2">Creating Chat App</Typography>
-              <Typography
-                variant="subtitle2"
-                component={Link}
-                color={theme.palette.primary.main}
-                to={"//http://www.google.com"}
-              >
-                www.google.com
-              </Typography>
+              {isPreview(el.message) ? (
+                <Typography
+                  variant="subtitle2"
+                  component={Link}
+                  color={theme.palette.primary.main}
+                  href={isPreview(el.message) ? el.message : ""}
+                  target="_blank"
+                >
+                  {el.message}
+                </Typography>
+              ) : (
+                <Typography
+                  variant="subtitle2"
+                  color={theme.palette.primary.main}
+                >
+                  {el.message}
+                </Typography>
+              )}
             </Stack>
-            <Typography
-              variant="body2"
-              color={el.incoming ? theme.palette.text : "#fff"}
-            >
-              {el.message}
-            </Typography>
           </Stack>
         </Stack>
       </Box>
-      {menu && <MessageActions />}
+      {(menu || !preview) && <MessageActions id={el.id} />}
     </Stack>
   );
 };
 
-const ReplyMessage = ({ el, menu }) => {
+const ReplyMessage = ({ el, menu, preview }) => {
+
   const theme = useTheme();
   return (
     <Stack direction={"row"} justifyContent={el.incoming ? "start" : "end"}>
@@ -119,41 +149,44 @@ const ReplyMessage = ({ el, menu }) => {
         p={1.5}
         sx={{
           backgroundColor: el.incoming
-            ? theme.palette.background.default
+            ? theme.palette.mode === "light"
+              ? "#fff"
+              : "#212B36"
             : theme.palette.primary.main,
           borderRadius: 1.5,
-          width: "max-content",
+          width:preview? "100%": "max-content",
+          maxWidth:"60%"
         }}
       >
         <Stack spacing={2}>
-          <Stack
-            p={2}
+          <Box
+            // p={2}
             direction={"column"}
             spacing={3}
             alignItems={"center"}
             sx={{
-              backgroundColor: theme.palette.background.paper,
+              backgroundColor:
+                theme.palette.mode === "light" ? "#F0F4FA" : "#161C24",
               borderRadius: 1,
             }}
           >
-            <Typography variant="body2" color={theme.palette.text}>
-              {el.message}
-            </Typography>
-          </Stack>
+            <ReplyMessageTemplate message={el.reply} incoming={el.incoming} isReply={true} />
+          </Box>
           <Typography
             ariant="body2"
             color={el.incoming ? theme.palette.text : "#fff"}
           >
-            {el.reply}
+            {el.message}
           </Typography>
         </Stack>
       </Box>
-      {menu && <MessageActions />}
+      {(menu || !preview) && <MessageActions id={el.id} />}
     </Stack>
   );
 };
 
-const MediaMsg = ({ el, menu }) => {
+const MediaMsg = ({ el, menu, preview }) => {
+
   const theme = useTheme();
   return (
     <Stack direction={"row"} justifyContent={el.incoming ? "start" : "end"}>
@@ -161,10 +194,13 @@ const MediaMsg = ({ el, menu }) => {
         p={1.5}
         sx={{
           backgroundColor: el.incoming
-            ? theme.palette.background.default
+            ? theme.palette.mode === "light"
+              ? "#fff"
+              : "#212B36"
             : theme.palette.primary.main,
           borderRadius: 1.5,
-          width: "max-content",
+          width: preview? "100%": "max-content",
+          maxWidth:"60%"
         }}
       >
         <Stack spacing={1}>
@@ -181,37 +217,39 @@ const MediaMsg = ({ el, menu }) => {
           </Typography>
         </Stack>
       </Box>
-      {menu && <MessageActions />}
+      {(menu || !preview) && <MessageActions id={el.id} />}
     </Stack>
   );
 };
 
-const TextMsg = ({ el, menu }) => {
+const TextMsg = ({ el, menu, preview, isReply }) => {
+
   const theme = useTheme();
   return (
-    <Stack
-      direction={"row"}
-      justifyContent={el.incoming ? "start" : "end"}
-    >
+    <Stack direction={"row"} justifyContent={el.incoming ? "start" : "end"}>
       <Box
         p={1.5}
         sx={{
           backgroundColor: el.incoming
-            ? theme.palette.background.default
-            : theme.palette.primary.main,
+            ? theme.palette.mode === "light"
+              ? isReply? "transparent" : "#fff"
+              : isReply? "transparent" : "#212B36"
+            : isReply? "transparent" : theme.palette.primary.main,
           borderRadius: 1.5,
-          width: "max-content",
+          width: preview? "100%": "max-content",
+          maxWidth:"60%"
         }}
       >
         <Typography
           variant="body2"
-          color={el.incoming ? theme.palette.text : "#fff"}
+          color={el.incoming ? theme.palette.text : isReply?theme.palette.mode === "light"? "#000" : "#fff" : "#fff"}
+          sx={{textAlign: el.incoming ?"start" : "end"}}
         >
           {el.message}
         </Typography>
       </Box>
       {/* dots three icon */}
-      {menu && <MessageActions />}
+      {(menu || !preview) && <MessageActions id={el.id} />}
     </Stack>
   );
 };
@@ -233,27 +271,37 @@ const TimeLine = ({ el }) => {
   );
 };
 
-const MessageActions = () => {
+const MessageActions = ({id}) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
+  const dispatch = useDispatch()
+  const handleClick = ({e, action}) => {
+    setAnchorEl(e.currentTarget);
+    if(action === "Reply"){
+      dispatch(ToggleIsReplyStatus({type:true, id}))
+    }
+    setAnchorEl(null);
   };
+
+  const handleDotsClick = (e) => {
+    setAnchorEl(e.currentTarget);
+  }
+
   const handleClose = () => {
     setAnchorEl(null);
   };
 
   return (
     <>
-        <DotsThreeVertical
-          id="basic-button"
-          aria-controls={open ? "basic-menu" : undefined}
-          aria-haspopup="true"
-          aria-expanded={open ? "true" : undefined}
-          onClick={handleClick}
-          size={20}
-          cursor={'pointer'}
-        />
+      <DotsThreeVertical
+        id="basic-button"
+        aria-controls={open ? "basic-menu" : undefined}
+        aria-haspopup="true"
+        aria-expanded={open ? "true" : undefined}
+        onClick={handleDotsClick}
+        size={20}
+        cursor={"pointer"}
+      />
       <Menu
         id="basic-menu"
         anchorEl={anchorEl}
@@ -264,8 +312,10 @@ const MessageActions = () => {
         }}
       >
         <Stack direction={"column"} spacing={1} px={1}>
-          {Message_options.map((el) => (
-            <MenuItem onClick={handleClick}>{el.title}</MenuItem>
+          {Message_options.map((el, idx) => (
+            <MenuItem key={idx} onClick={(e)=>handleClick({e, action:el.title})}>
+              {el.title}
+            </MenuItem>
           ))}
         </Stack>
       </Menu>

@@ -164,8 +164,8 @@ const ChatHeader = () => {
           >
             <Box p={1}>
               <Stack spacing={1}>
-                {Conversation_Menu.map((el) => (
-                  <MenuItem onClick={handleCloseConversationMenu}>
+                {Conversation_Menu.map((el, idx) => (
+                  <MenuItem key={idx} onClick={handleCloseConversationMenu}>
                     <Stack
                       sx={{ minWidth: 100 }}
                       direction="row"

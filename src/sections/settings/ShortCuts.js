@@ -120,8 +120,8 @@ const ShortCuts = ({ open, handleClose }) => {
                     <Stack direction={'row'} sx={{width: '100%'}} justifyContent={'space-between'} spacing={3} alignItems={'center'} >
                         <Typography variant="caption" sx={{fontSize: 14}} >{title}</Typography>
                         <Stack spacing={2} direction={'row'} >
-                            {combination.map((el)=>{
-                                return <Button disabled variant="contained" sx={{color: '#212121'}} >{el}</Button>
+                            {combination.map((el, idx)=>{
+                                return <Button key={idx} disabled variant="contained" sx={{color: '#212121'}} >{el}</Button>
                             })}
                         </Stack>
                     </Stack>

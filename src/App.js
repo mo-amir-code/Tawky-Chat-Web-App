@@ -8,13 +8,14 @@ import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
-    <ThemeProvider>
+    <>
       <Toaster position="top-right" reverseOrder={true} />
-      <ThemeSettings>
-        {" "}
-        <Router />{" "}
-      </ThemeSettings>
-    </ThemeProvider>
+      <ThemeProvider>
+        <ThemeSettings>
+          <Router />
+        </ThemeSettings>
+      </ThemeProvider>
+    </>
   );
 }
 

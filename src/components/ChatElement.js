@@ -1,6 +1,8 @@
 import { Avatar, Badge, Box, Stack, Typography, styled, useTheme } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { SelectConversation } from "../Redux/slices/app/app";
+import { socket } from '../socket'
+import { ClearUnread, selectExistingConversation } from "../Redux/slices/conversation/conversation";
 
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
@@ -32,7 +34,7 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
     },
   }));
 
-const ChatElement = ({ id, name, img, msg, time, unread, online }) => {
+const ChatElement = ({ id, name, img, msg, time, unread, online, userId }) => {
     const theme = useTheme()
     const dispatch = useDispatch()
   return (
@@ -45,6 +47,10 @@ const ChatElement = ({ id, name, img, msg, time, unread, online }) => {
       }}
       onClick={()=>{
         dispatch(SelectConversation({roomId:id}))
+        dispatch(ClearUnread({id}))
+        socket.emit("select-existing-conversation", {roomId:id, userId}, (data) => {
+          dispatch(selectExistingConversation({roomId:data.id, messages:data.messages}))
+        } )
       }}
     >
       <Stack
